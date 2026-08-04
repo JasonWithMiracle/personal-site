@@ -6,7 +6,7 @@ project_category: "工具链开发"
 work_type: "MCP集成"
 date: "2026-07-31"
 tags: ["opa", "工具链开发", "MCP集成", "墨刀", "WorkBuddy"]
-has_diagrams: undefined
+has_diagrams: true
 order: 2
 status: "published"
 draft: false
@@ -56,11 +56,13 @@ flowchart TD
 ## 六、经验教训与最佳实践
 <div class="callout callout-tip">
 <p class="callout-title">最佳实践</p>
-> 接入第三方 AI 能力优先查官方 MCP；墨刀/asta 等均用 `type:http + url + headers` 的 Streamable HTTP 形态，WorkBuddy 原生支持。
-> 调用墨刀生成务必按异步处理：generate_* 拿 task_id → get_task_result 轮询（~300s）→ 取 preview_url/task_url。
+<p>接入第三方 AI 能力优先查官方 MCP；墨刀/asta 等均用 <code>type:http + url + headers</code> 的 Streamable HTTP 形态，WorkBuddy 原生支持。</p>
+<p>调用墨刀生成务必按异步处理：generate_* 拿 task_id → get_task_result 轮询（~300s）→ 取 preview_url/task_url。</p>
+</div>
 <div class="callout callout-warning">
 <p class="callout-title">踩坑预警</p>
-> 不要把明文令牌硬编码进共享仓库；优先 OAuth 或 `${ENV}` 展开。文档/博客的工具名可能过时，以 `tools/list` 实测为准。
+<p>不要把明文令牌硬编码进共享仓库；优先 OAuth 或 <code>${ENV}</code> 展开。文档/博客的工具名可能过时，以 <code>tools/list</code> 实测为准。</p>
+</div>
 
 ## 七、关联资产
 - 配置：~/.workbuddy/mcp.json 的 modao 条目

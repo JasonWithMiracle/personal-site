@@ -7,7 +7,7 @@ project_category_en: "Toolchain / MCP Integration"
 work_type: "MCP集成"
 date: "2026-07-31"
 tags: ["opa", "工具链开发", "MCP集成", "墨刀", "WorkBuddy"]
-has_diagrams: undefined
+has_diagrams: true
 order: 2
 status: "published"
 draft: false
@@ -40,8 +40,10 @@ draft: false
 ## Lessons
 <div class="callout callout-tip">
 <p class="callout-title">Best practice</p>
-> Prefer the official MCP when plugging in third-party AI; Modao/asta etc. all use `type:http + url + headers` Streamable HTTP, natively supported by WorkBuddy.
-> Always treat Modao generation as **async**: `generate_*` returns a `task_id` → poll `get_task_result` (~300s) → take `preview_url`/`task_url`.
+<p>Prefer the official MCP when plugging in third-party AI; Modao/asta etc. all use <code>type:http + url + headers</code> Streamable HTTP, natively supported by WorkBuddy.</p>
+<p>Always treat Modao generation as <strong>async</strong>: <code>generate_*</code> returns a <code>task_id</code> → poll <code>get_task_result</code> (~300s) → take <code>preview_url</code>/<code>task_url</code>.</p>
+</div>
 <div class="callout callout-warning">
 <p class="callout-title">Pitfalls</p>
-> Never hardcode a plaintext token into a shared repo; prefer OAuth or `${ENV}` expansion. Blog/docs tool names go stale—trust `tools/list` from a live probe.
+<p>Never hardcode a plaintext token into a shared repo; prefer OAuth or <code>${ENV}</code> expansion. Blog/docs tool names go stale—trust <code>tools/list</code> from a live probe.</p>
+</div>

@@ -91,6 +91,7 @@ function transformBody(md) {
       const title = co[2].trim();
       out.push(`<div class="callout callout-${type}">`);
       if (title) out.push(`<p class="callout-title">${inlineFmt(applyLinks(title))}</p>`);
+      callout = type;
       i++;
       continue;
     }
@@ -145,7 +146,7 @@ function writeEntry(lang, slug, meta, body) {
     meta.work_type ? `work_type: ${JSON.stringify(meta.work_type)}` : null,
     meta.date ? `date: ${JSON.stringify(meta.date)}` : null,
     `tags: [${meta.tags.map((t) => JSON.stringify(t)).join(', ')}]`,
-    `has_diagrams: ${meta.has_diagrams}`,
+    `has_diagrams: ${meta.hasDiagrams}`,
     `order: ${meta.order}`,
     `status: "published"`,
     `draft: false`,

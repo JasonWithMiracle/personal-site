@@ -7,7 +7,7 @@ project_category_en: "Feishu KB Restructure"
 work_type: "架构选型"
 date: "2026-07-30"
 tags: ["opa", "飞书知识库重构", "知识管理", "架构选型", "最佳实践"]
-has_diagrams: undefined
+has_diagrams: true
 order: 1
 status: "published"
 draft: false
@@ -31,10 +31,12 @@ Feishu cloud docs had piled up unstructured and were hard to retrieve or reuse. 
 ## Lessons
 <div class="callout callout-tip">
 <p class="callout-title">Reusable lessons</p>
-> **Source immutability is the baseline**: source docs are read-only; all processing happens in `wiki/`, so knowledge never gets messier with age.
-> **LLM owns the wiki, humans read**: delegate distillation/links/maintenance to the LLM as routine, and humans only consume—then the snowball keeps rolling.
-> **Keep process artifacts out of the body**: isolating `report/` keeps the graph clean and search uncluttered.
-> **frontmatter discipline sets the ceiling**: fill `type/status/tags/related` and Dataview + lint actually run.
+<p><strong>Source immutability is the baseline</strong>: source docs are read-only; all processing happens in <code>wiki/</code>, so knowledge never gets messier with age.</p>
+<p><strong>LLM owns the wiki, humans read</strong>: delegate distillation/links/maintenance to the LLM as routine, and humans only consume—then the snowball keeps rolling.</p>
+<p><strong>Keep process artifacts out of the body</strong>: isolating <code>report/</code> keeps the graph clean and search uncluttered.</p>
+<p><strong>frontmatter discipline sets the ceiling</strong>: fill <code>type/status/tags/related</code> and Dataview + lint actually run.</p>
+</div>
 <div class="callout callout-warning">
 <p class="callout-title">Pitfalls</p>
-> Don't mix source and distilled pages in one folder; don't hand-maintain indexes; don't skip frontmatter—each breaks retrievability.
+<p>Don't mix source and distilled pages in one folder; don't hand-maintain indexes; don't skip frontmatter—each breaks retrievability.</p>
+</div>
