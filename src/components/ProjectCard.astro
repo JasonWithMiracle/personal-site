@@ -1,0 +1,53 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { Locale } from '../lib/i18n';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  locale: Locale;
+}
+const { project, locale } = Astro.props;
+const d = project.data;
+
+// 纯色占位：根据标题生成稳定的浅色调，避免空白或破图
+function hashHue(str: string) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 360;
+  return h;
+}
+const placeholder = `hsl(${hashHue(d.title)}, 60%, 90%)`;
+const coverStyle = d.cover ? `background-image:url(${d.cover})` : `background:${placeholder}`;
+---
+
+<article class="card reveal">
+  {
+    d.link ? (
+      <a href={d.link} target="_blank" rel="noopener" style="display:block">
+        <div class="card-cover" style={coverStyle} />
+      </a>
+    ) : (
+      <div class="card-cover" style={coverStyle} />
+    )
+  }
+  <div class="card-body">
+    <span class="card-meta">{d.year}</span>
+    <h3>
+      {d.link ? (
+        <a href={d.link} target="_blank" rel="noopener">{d.title}</a>
+      ) : (
+        d.title
+      )}
+    </h3>
+    <p class="muted">{d.summary}</p>
+    {
+      d.tags.length > 0 && (
+        <div class="tags">
+          {d.tags.map((t) => (
+            <span class="tag">{t}</span>
+          ))}
+        </div>
+      )
+    }
+    {d.link && <a class="card-link" href={d.link} target="_blank" rel="noopener">查看 →</a>}
+  </div>
+</article>

@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { UI } from '../../lib/i18n';
+
+const locale = 'zh';
+const ui = UI[locale];
+
+const articles = (await getCollection('articles'))
+  .filter((a) => a.data.lang === locale && !a.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout
+  title={`${ui.nav.articles} · Jason`}
+  description={ui.articlesDesc}
+  locale={locale}
+  pathname={Astro.url.pathname}
+>
+  <section class="section reveal">
+    <h1 class="page-title">{ui.nav.articles}</h1>
+    <p class="page-sub">{ui.articlesDesc}</p>
+    <div class="grid">
+      {articles.map((a) => <ArticleCard article={a} locale={locale} />)}
+    </div>
+  </section>
+</BaseLayout>

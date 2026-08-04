@@ -1,0 +1,65 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getEntry } from 'astro:content';
+import { UI, toggleLocale, otherLocale, type Locale } from '../lib/i18n';
+
+interface Props {
+  title: string;
+  description?: string;
+  locale: Locale;
+  pathname: string;
+}
+
+const { title, description = '', locale, pathname } = Astro.props;
+const ui = UI[locale];
+
+// 用“关于我”里的名字作为品牌名（取不到时回退为 Jason）
+const about = await getEntry('about', locale);
+const name = about?.data.name ?? 'Jason';
+
+const altUrl = toggleLocale(pathname, otherLocale(locale));
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <Header locale={locale} pathname={pathname} altUrl={altUrl} ui={ui} brand={name} />
+    <main class="container">
+      <slot />
+    </main>
+    <Footer locale={locale} ui={ui} name={name} />
+
+    <script>
+      // 滚动进入视口时触发淡入（Reveal 动效）
+      const els = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-visible');
+                io.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+        );
+        els.forEach((el) => io.observe(el));
+      } else {
+        els.forEach((el) => el.classList.add('is-visible'));
+      }
+    </script>
+  </body>
+</html>

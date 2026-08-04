@@ -1,0 +1,40 @@
+---
+import type { Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  pathname: string;
+  altUrl: string;
+  ui: any;
+  brand: string;
+}
+
+const { locale, pathname, altUrl, ui, brand } = Astro.props;
+
+const navItems = [
+  { href: locale === 'zh' ? '/' : '/en', label: ui.nav.home },
+  { href: locale === 'zh' ? '/portfolio' : '/en/portfolio', label: ui.nav.portfolio },
+  { href: locale === 'zh' ? '/articles' : '/en/articles', label: ui.nav.articles },
+];
+
+const isActive = (href: string) => {
+  if (href === '/' || href === '/en') return pathname === href;
+  return pathname.startsWith(href);
+};
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href={locale === 'zh' ? '/' : '/en'}>{brand}</a>
+    <nav class="nav">
+      {
+        navItems.map((item) => (
+          <a class={`nav-link ${isActive(item.href) ? 'active' : ''}`} href={item.href}>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+    <a class="lang-switch" href={altUrl} aria-label={ui.switchTo}>{ui.langLabel}</a>
+  </div>
+</header>

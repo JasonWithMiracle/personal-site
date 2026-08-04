@@ -1,0 +1,46 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { Locale } from '../lib/i18n';
+
+interface Props {
+  article: CollectionEntry<'articles'>;
+  locale: Locale;
+}
+const { article, locale } = Astro.props;
+const d = article.data;
+const dateStr = d.date.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+const href = `/articles/${article.id}`;
+
+// 纯色占位：根据标题生成稳定的浅色调，避免空白或破图
+function hashHue(str: string) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 360;
+  return h;
+}
+const placeholder = `hsl(${hashHue(d.title)}, 60%, 90%)`;
+const coverStyle = d.cover ? `background-image:url(${d.cover})` : `background:${placeholder}`;
+---
+
+<article class="card reveal">
+  <a href={href} style="display:block">
+    <div class="card-cover" style={coverStyle}></div>
+  </a>
+  <div class="card-body">
+    <span class="card-meta">{dateStr}</span>
+    <h3><a href={href}>{d.title}</a></h3>
+    <p class="muted">{d.summary}</p>
+    {
+      d.tags.length > 0 && (
+        <div class="tags">
+          {d.tags.map((t) => (
+            <span class="tag">{t}</span>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</article>

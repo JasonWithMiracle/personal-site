@@ -1,0 +1,19 @@
+---
+import type { Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  ui: any;
+  name: string;
+}
+
+const { ui, name } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span>© {year} {name}</span>
+    <a class="to-top" href="#top">{ui.backToTop}</a>
+  </div>
+</footer>

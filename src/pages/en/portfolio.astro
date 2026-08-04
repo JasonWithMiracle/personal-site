@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { UI } from '../../lib/i18n';
+
+const locale = 'en';
+const ui = UI[locale];
+
+const projects = (await getCollection('projects'))
+  .filter((p) => p.data.lang === locale)
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title={`${ui.nav.portfolio} · Jason`}
+  description={ui.portfolioDesc}
+  locale={locale}
+  pathname={Astro.url.pathname}
+>
+  <section class="section reveal">
+    <h1 class="page-title">{ui.nav.portfolio}</h1>
+    <p class="page-sub">{ui.portfolioDesc}</p>
+    <div class="grid">
+      {projects.map((p) => <ProjectCard project={p} />)}
+    </div>
+  </section>
+</BaseLayout>

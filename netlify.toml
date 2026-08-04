@@ -1,0 +1,11 @@
+# Netlify 部署配置（免费版即可）
+# 在 Netlify 后台 “New site from Git” 关联本仓库后，以下配置会自动生效。
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# 纯静态站点，所有路径都回退到对应目录页，避免刷新 404
+[[redirects]]
+  from = "/en/*"
+  to = "/en/:splat"
+  status = 200
