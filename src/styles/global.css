@@ -467,6 +467,61 @@ main.container {
   transform: none;
 }
 
+/* ============================ Callouts (Obsidian 风格) ============================ */
+.callout {
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin: 22px 0;
+  border: 1px solid var(--border-light);
+  border-left: 4px solid var(--accent);
+  background: var(--surface-2);
+}
+.callout-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.callout p {
+  margin: 4px 0;
+}
+.callout-tip { border-left-color: #34c759; background: #eafaf0; }
+.callout-warning { border-left-color: #ff9f0a; background: #fff5e6; }
+.callout-important { border-left-color: #0071e3; background: #eef4fd; }
+.callout-note { border-left-color: #86868b; background: var(--surface-2); }
+.callout-danger { border-left-color: #ff3b30; background: #ffeceb; }
+.callout-success { border-left-color: #34c759; background: #eafaf0; }
+
+/* ============================ Mermaid 图表 ============================ */
+.mermaid {
+  background: var(--surface-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin: 22px 0;
+  overflow-x: auto;
+  text-align: center;
+}
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ============================ Practice 分组列表 ============================ */
+.practice-group {
+  margin-bottom: 48px;
+}
+.group-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 8px 0 20px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-light);
+}
+.site-version {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
 /* ============================ Responsive ============================ */
 @media (max-width: 640px) {
   body {

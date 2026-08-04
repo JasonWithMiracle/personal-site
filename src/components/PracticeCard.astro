@@ -1,0 +1,42 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { Locale } from '../lib/i18n';
+
+interface Props {
+  entry: CollectionEntry<'practice'>;
+  locale: Locale;
+}
+const { entry, locale } = Astro.props;
+const d = entry.data;
+const href = `/practice/${entry.id}/`;
+
+function hashHue(str: string) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 360;
+  return h;
+}
+const placeholder = `hsl(${hashHue(d.title)}, 60%, 90%)`;
+const metaLabel =
+  locale === 'en'
+    ? (d.project_category_en || d.project_category) + (d.work_type ? ' · ' + d.work_type : '')
+    : d.project_category + (d.work_type ? ' · ' + d.work_type : '');
+---
+<article class="card reveal">
+  <a href={href} style="display:block">
+    <div class="card-cover" style={`background:${placeholder}`}></div>
+  </a>
+  <div class="card-body">
+    <span class="card-meta">{metaLabel}</span>
+    <h3><a href={href}>{d.title}</a></h3>
+    <p class="muted">{d.summary}</p>
+    {
+      d.tags.length > 0 && (
+        <div class="tags">
+          {d.tags.map((t) => (
+            <span class="tag">{t}</span>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</article>

@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PracticeCard from '../../components/PracticeCard.astro';
+import { UI } from '../../lib/i18n';
+
+const locale = 'zh';
+const ui = UI[locale];
+
+const items = (await getCollection('practice'))
+  .filter((p) => p.data.lang === locale && !p.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const groups = new Map();
+for (const it of items) {
+  const key = it.data.project_category;
+  if (!groups.has(key)) groups.set(key, []);
+  groups.get(key).push(it);
+}
+const groupList = [...groups.entries()]
+  .map(([cat, list]) => ({
+    cat,
+    list: list.sort((a, b) => a.data.order - b.data.order),
+  }))
+  .sort((g1, g2) => Math.min(...g1.list.map((l) => l.data.order)) - Math.min(...g2.list.map((l) => l.data.order)));
+---
+<BaseLayout
+  title={`${ui.nav.practice} · Jason`}
+  description={ui.practiceDesc}
+  locale={locale}
+  pathname={Astro.url.pathname}
+>
+  <section class="section reveal">
+    <h1 class="page-title">{ui.nav.practice}</h1>
+    <p class="page-sub">{ui.practiceDesc}</p>
+    {
+      groupList.map((g) => (
+        <div class="practice-group">
+          <h2 class="group-title">{g.cat}</h2>
+          <div class="grid">
+            {g.list.map((it) => <PracticeCard entry={it} locale={locale} />)}
+          </div>
+        </div>
+      ))
+    }
+  </section>
+</BaseLayout>
