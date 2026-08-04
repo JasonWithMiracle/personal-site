@@ -7,6 +7,10 @@
 - 语言：中文 `/` · 英文 `/en`
 - 托管：Netlify（免费）
 
+> ✅ **部署状态（已上线）**：https://magnificent-toffee-7658ee.netlify.app/
+> GitHub 仓库 `JasonWithMiracle/personal-site` 已与 Netlify 连通，推送即自动部署；
+> 本地 `main` 与 GitHub `main` 历史已对齐，GitHub Desktop 连接后直接 up-to-date，无需 Pull。
+
 ---
 
 ## 一、目录结构（你日常只会碰到 `src/content`）
