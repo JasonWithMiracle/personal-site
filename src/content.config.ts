@@ -46,4 +46,22 @@ const articles = defineCollection({
   }),
 });
 
-export const collections = { about, projects, articles };
+const practice = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/practice' }),
+  schema: z.object({
+    title: z.string(),
+    lang: z.enum(['zh', 'en']),
+    summary: z.string(),
+    project_category: z.string(),
+    project_category_en: z.string().optional(),
+    work_type: z.string().optional(),
+    date: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    has_diagrams: z.boolean().default(false),
+    order: z.number().default(999),
+    status: z.string().default('published'),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { about, projects, articles, practice };
