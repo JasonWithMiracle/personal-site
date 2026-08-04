@@ -12,20 +12,23 @@ interface Props {
 const { locale, pathname, altUrl, ui, brand } = Astro.props;
 
 const navItems = [
-  { href: locale === 'zh' ? '/' : '/en', label: ui.nav.home },
-  { href: locale === 'zh' ? '/portfolio' : '/en/portfolio', label: ui.nav.portfolio },
-  { href: locale === 'zh' ? '/articles' : '/en/articles', label: ui.nav.articles },
+  { href: locale === 'zh' ? '/' : '/en/', label: ui.nav.home },
+  { href: locale === 'zh' ? '/portfolio/' : '/en/portfolio/', label: ui.nav.portfolio },
+  { href: locale === 'zh' ? '/articles/' : '/en/articles/', label: ui.nav.articles },
 ];
 
 const isActive = (href: string) => {
-  if (href === '/' || href === '/en') return pathname === href;
-  return pathname.startsWith(href);
+  const norm = (s: string) => (s.length > 1 ? s.replace(/\/$/, '') : s);
+  const p = norm(pathname);
+  const h = norm(href);
+  if (h === '/' || h === '/en') return p === h;
+  return p === h || p.startsWith(h + '/');
 };
 ---
 
 <header class="site-header">
   <div class="container header-inner">
-    <a class="brand" href={locale === 'zh' ? '/' : '/en'}>{brand}</a>
+    <a class="brand" href={locale === 'zh' ? '/' : '/en/'}>{brand}</a>
     <nav class="nav">
       {
         navItems.map((item) => (

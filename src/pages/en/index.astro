@@ -32,8 +32,8 @@ const articles = (await getCollection('articles'))
     <h1 class="hero-title">{d.name}</h1>
     <p class="hero-tagline">{d.tagline}</p>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="/en/portfolio">{ui.nav.portfolio} →</a>
-      <a class="btn btn-ghost" href="/en/articles">{ui.nav.articles}</a>
+      <a class="btn btn-primary" href="/en/portfolio/">{ui.nav.portfolio} →</a>
+      <a class="btn btn-ghost" href="/en/articles/">{ui.nav.articles}</a>
     </div>
   </section>
 
@@ -58,7 +58,7 @@ const articles = (await getCollection('articles'))
       <section class="section reveal">
         <div class="section-head">
           <h2 class="section-title">{ui.featured}</h2>
-          <a class="link-more" href="/en/portfolio">{ui.viewAll} →</a>
+          <a class="link-more" href="/en/portfolio/">{ui.viewAll} →</a>
         </div>
         <div class="grid">
           {projects.map((p) => (
@@ -74,7 +74,7 @@ const articles = (await getCollection('articles'))
       <section class="section reveal">
         <div class="section-head">
           <h2 class="section-title">{ui.recent}</h2>
-          <a class="link-more" href="/en/articles">{ui.viewAll} →</a>
+          <a class="link-more" href="/en/articles/">{ui.viewAll} →</a>
         </div>
         <div class="grid">
           {articles.map((a) => (

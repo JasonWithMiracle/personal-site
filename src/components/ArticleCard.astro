@@ -13,7 +13,7 @@ const dateStr = d.date.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
   month: 'short',
   day: 'numeric',
 });
-const href = `/articles/${article.id}`;
+const href = `/articles/${article.id}/`;
 
 // 纯色占位：根据标题生成稳定的浅色调，避免空白或破图
 function hashHue(str: string) {

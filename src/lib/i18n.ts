@@ -63,11 +63,11 @@ export function toggleLocale(pathname: string, to: Locale): string {
   const art = pathname.match(/^\/articles\/(zh|en)\/(.+)$/);
   if (art) {
     const other = art[1] === 'zh' ? 'en' : 'zh';
-    return `/articles/${other}/${art[2]}`;
+    return `/articles/${other}/${art[2]}/`;
   }
   // 栏目页：通过 /en 前缀切换
   let p = pathname;
   if (p.startsWith('/en')) p = p.slice(3) || '/';
-  if (to === 'en') return p === '/' ? '/en' : '/en' + p;
+  if (to === 'en') return p === '/' ? '/en/' : '/en' + p;
   return p;
 }

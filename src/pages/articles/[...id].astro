@@ -28,8 +28,8 @@ const dateStr = d.date.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
 
 // 文章详情的语言切换：替换路径内嵌的语言段
 const slug = id.split('/').slice(1).join('/');
-const altUrl = `/articles/${otherLocale(locale)}/${slug}`;
-const listHref = locale === 'zh' ? '/articles' : '/en/articles';
+const altUrl = `/articles/${otherLocale(locale)}/${slug}/`;
+const listHref = locale === 'zh' ? '/articles/' : '/en/articles/';
 ---
 
 <BaseLayout
