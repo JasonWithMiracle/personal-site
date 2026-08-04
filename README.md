@@ -21,7 +21,8 @@
 │  ├─ content/
 │  │  ├─ about/      ← 个人简介（zh.md / en.md），一般不用改
 │  │  ├─ projects/   ← 作品集（每件作品一个 .md）
-│  │  └─ articles/   ← 文章（你日常写的地方）
+│  │  ├─ articles/   ← 文章（你日常写的地方）
+│  │  └─ practice/   ← 实践经验（从知识库「组织过程资产/经验总结」自动导入，见第七节）
 │  ├─ pages/         ← 页面代码（不用碰）
 │  ├─ components/    ← 组件（不用碰）
 │  ├─ styles/        ← 设计风格（想换颜色改这里）
@@ -110,3 +111,57 @@ npm run dev
 ## 六、想改风格
 
 打开 `src/styles/global.css` 顶部的 `:root`，里面有颜色、圆角、阴影等变量，改这里就能整体换肤。
+
+---
+
+## 七、发布实践经验（从 Obsidian 知识库导入）
+
+「实践经验」栏目把知识库 `组织过程资产/经验总结/` 下**已标记发布**的结构化经验，自动转换成网站上的中英双语案例。
+
+### 1. 在知识库里标记要发布的笔记
+
+在任意一篇 `组织过程资产/经验总结/<项目类别>/<工作类型>/<日期>-<主题>.md` 的 frontmatter 上加发布开关：
+
+```markdown
+---
+title: 经验标题
+date: 2026-07-31
+project_category: 工具链开发      # 中文分类（列表页按此分组）
+work_type: MCP集成               # 工作类型（卡片副标题）
+website_publish: true            # ← 发布开关：true 才同步到网站
+website_slug: modao-requirement-prototype   # ← 固定 slug，决定 URL
+website_order: 2                 # ← 同组内排序，越小越靠前
+has_diagrams: true               # ← 含 mermaid 图时写 true
+tags: [opa, 工具链开发, MCP集成, 墨刀]
+---
+```
+
+- **英文版**：在同目录放一个同名 `.en.md`（如 `xxx.en.md`），只需写 `title` / `summary` / `project_category`（英文分类名）；中文版自动生成。
+- 不写 `website_publish: true` 的笔记不会被同步，兼顾隐私与质量。
+
+### 2. 运行导入脚本
+
+在本地仓库目录执行（脚本会扫描知识库、转译 callout / mermaid / wikilink，生成 `src/content/practice/zh|en/*.md`）：
+
+```bash
+node scripts/import-practice.mjs
+```
+
+### 3. 提交并推送
+
+```bash
+git add src/content/practice scripts
+git commit -m "chore: import practice entries"
+git push
+```
+
+Netlify 自动重建后，以下页面即生效：
+
+- 列表页：中文 `/practice/` · 英文 `/en/practice/`
+- 详情页：`/practice/zh/<slug>/` · `/practice/en/<slug>/`
+
+### 4. 其他约定
+
+- **Mermaid 图表**：详情页通过 CDN 按需加载 `mermaid@11`，运行时套用浅色适配主题（白底、浅蓝节点、`#0071e3` 边框），参考 `beautiful-mermaid` 的「清晰优先、充足留白」排版理念。
+- **底部版本号**：页脚显示 `v<SITE_VERSION>`（`src/lib/site.ts` 中的 `SITE_VERSION`），方便快速迭代监看；每次大改可手动 +1。
+- **Obsidian 独有语法**会被转译：`> [!tip]` 等 callout → 带样式的提示框；`[[wikilink]]` → 纯文本；本地绝对路径 → “本地 Obsidian vault”。
