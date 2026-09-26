@@ -267,6 +267,7 @@ main.container {
 .card-cover {
   aspect-ratio: 16 / 10;
   width: 100%;
+  display: block;
   background: linear-gradient(135deg, #e9e9f0 0%, #d7e3f4 50%, #cfe3f7 100%);
   background-size: cover;
   background-position: center;
@@ -296,6 +297,33 @@ main.container {
   font-size: 14px;
   font-weight: 500;
   margin-top: 4px;
+}
+/* 卡片底部操作行：左「查看详情」右「GitHub 外链」 */
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+}
+.card-actions .card-link {
+  margin-top: 0;
+}
+.card-link-ext {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  white-space: nowrap;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease),
+    background 0.2s var(--ease);
+}
+.card-link-ext:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--surface-2);
 }
 
 /* ============================ Tags ============================ */
@@ -334,46 +362,122 @@ main.container {
 }
 
 /* ============================ Prose (文章正文) ============================ */
+/* v2 排版增强：标题层级 / 段落节奏 / 引用卡片化 / 表格 / 图注 / 任务列表 */
 .prose {
   font-size: 17px;
-  line-height: 1.75;
+  line-height: 1.8;
   color: var(--text);
+  letter-spacing: 0.01em;
+  word-wrap: break-word;
 }
-.prose h2 {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  margin: 40px 0 14px;
+.prose > *:first-child {
+  margin-top: 0;
 }
-.prose h3 {
-  font-size: 21px;
-  font-weight: 600;
-  margin: 30px 0 10px;
+.prose > *:last-child {
+  margin-bottom: 0;
+}
+/* 开篇段稍作放大，形成阅读入口 */
+.prose > p:first-of-type {
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 22px;
 }
 .prose p {
-  margin: 16px 0;
+  margin: 18px 0;
+}
+.prose h2 {
+  font-size: clamp(22px, 3.2vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  margin: 48px 0 16px;
+  padding-top: 26px;
+  border-top: 1px solid var(--border-light);
+}
+.prose > h2:first-child {
+  margin-top: 8px;
+  padding-top: 0;
+  border-top: none;
+}
+.prose h3 {
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.005em;
+  margin: 34px 0 12px;
+}
+.prose h4 {
+  font-size: 17px;
+  font-weight: 650;
+  color: var(--text-secondary);
+  margin: 26px 0 10px;
+}
+.prose h2 + p,
+.prose h3 + p,
+.prose h4 + p {
+  margin-top: 10px;
+}
+.prose strong {
+  font-weight: 650;
+  color: #000;
+}
+.prose em {
+  font-style: normal;
+  color: var(--text-secondary);
 }
 .prose ul,
 .prose ol {
-  margin: 16px 0;
-  padding-left: 24px;
+  margin: 18px 0;
+  padding-left: 26px;
 }
 .prose li {
+  margin: 10px 0;
+  padding-left: 2px;
+}
+.prose li::marker {
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+.prose ul ul,
+.prose ol ol,
+.prose ul ol,
+.prose ol ul {
   margin: 8px 0;
 }
+/* 任务列表：- [ ] / - [x] */
+.prose li input[type='checkbox'] {
+  margin-right: 8px;
+  accent-color: var(--accent);
+}
+.prose li:has(> input[type='checkbox']) {
+  list-style: none;
+  margin-left: -22px;
+}
+/* 引用：卡片化，不再是纯斜体 */
 .prose blockquote {
   border-left: 3px solid var(--accent);
-  padding: 4px 0 4px 18px;
-  margin: 22px 0;
+  background: var(--surface-2);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 14px 18px;
+  margin: 26px 0;
   color: var(--text-secondary);
-  font-style: italic;
+}
+.prose blockquote p {
+  margin: 6px 0;
+}
+.prose blockquote p:first-child {
+  margin-top: 0;
+}
+.prose blockquote p:last-child {
+  margin-bottom: 0;
 }
 .prose code {
   font-family: "SF Mono", ui-monospace, "Cascadia Code", Menlo, monospace;
-  font-size: 0.9em;
+  font-size: 0.88em;
   background: var(--surface-2);
+  border: 1px solid var(--border-light);
   padding: 2px 6px;
   border-radius: 6px;
+  color: #c7254e;
 }
 .prose pre {
   background: #1d1d1f;
@@ -381,20 +485,99 @@ main.container {
   padding: 18px 20px;
   border-radius: var(--radius-md);
   overflow-x: auto;
-  margin: 22px 0;
+  margin: 24px 0;
+  font-size: 14px;
+  line-height: 1.65;
+  box-shadow: var(--shadow-soft);
 }
 .prose pre code {
   background: transparent;
+  border: none;
   padding: 0;
   color: inherit;
+  font-size: inherit;
 }
+/* 表格 */
+.prose table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 26px 0;
+  font-size: 15px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.prose thead th {
+  background: var(--surface-2);
+  font-weight: 650;
+  text-align: left;
+  color: var(--text);
+  white-space: nowrap;
+}
+.prose th,
+.prose td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-light);
+}
+.prose tbody tr:last-child td {
+  border-bottom: none;
+}
+.prose tbody tr:nth-child(even) {
+  background: #fcfcfd;
+}
+/* 图片 */
 .prose img {
   border-radius: var(--radius-md);
-  margin: 22px 0;
+  margin: 26px 0;
+  box-shadow: var(--shadow-soft);
+}
+/* 图注约定：图片独占一段后紧跟的斜体段落 → 渲染为居中灰色小字 */
+.prose p > img:only-child {
+  margin-bottom: 8px;
+}
+.prose p:has(> img:only-child) + p > em:only-child {
+  display: block;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-top: -14px;
+  margin-bottom: 26px;
+}
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--border-light);
+  margin: 40px 0;
 }
 .prose a {
   text-decoration: underline;
   text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.prose a:hover {
+  text-decoration-thickness: 2px;
+}
+.prose kbd {
+  font-family: "SF Mono", ui-monospace, monospace;
+  font-size: 0.85em;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+/* 移动端收敛间距，避免长文过于松散 */
+@media (max-width: 640px) {
+  .prose {
+    font-size: 16px;
+  }
+  .prose > p:first-of-type {
+    font-size: 17px;
+  }
+  .prose h2 {
+    margin: 36px 0 14px;
+    padding-top: 20px;
+  }
 }
 
 /* ============================ Post page ============================ */
@@ -425,6 +608,42 @@ main.container {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-secondary);
+}
+
+/* 详情页顶部操作区（GitHub 外链 / 演示 / 语言切换） */
+.post-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 4px 0 26px;
+}
+/* 详情页底部上下篇导航 */
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 48px;
+  padding-top: 26px;
+  border-top: 1px solid var(--border-light);
+}
+.post-nav-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 46%;
+}
+.post-nav-item.align-right {
+  text-align: right;
+  align-items: flex-end;
+  margin-left: auto;
+}
+.post-nav-label {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+.post-nav-title {
+  font-size: 16px;
+  font-weight: 600;
 }
 
 /* ============================ About avatar ============================ */

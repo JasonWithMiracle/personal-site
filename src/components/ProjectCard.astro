@@ -1,13 +1,22 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import type { Locale } from '../lib/i18n';
+import { UI, type Locale } from '../lib/i18n';
 
 interface Props {
   project: CollectionEntry<'projects'>;
-  locale: Locale;
+  locale?: Locale;
 }
-const { project, locale } = Astro.props;
+const { project } = Astro.props;
 const d = project.data;
+const locale = (Astro.props.locale ?? d.lang) as Locale;
+const ui = UI[locale];
+
+// 详情页地址：/portfolio/<lang>/<slug>/
+const slug = project.id.split('/').slice(1).join('/');
+const detailHref = `/portfolio/${d.lang}/${slug}/`;
+
+// 外链：github 优先用同步脚本回写值，其次按 repo 拼
+const githubUrl = d.github || (d.repo ? `https://github.com/${d.repo}` : null);
 
 // 纯色占位：根据标题生成稳定的浅色调，避免空白或破图
 function hashHue(str: string) {
@@ -17,26 +26,19 @@ function hashHue(str: string) {
 }
 const placeholder = `hsl(${hashHue(d.title)}, 60%, 90%)`;
 const coverStyle = d.cover ? `background-image:url(${d.cover})` : `background:${placeholder}`;
+
+const metas: string[] = [];
+if (d.year) metas.push(d.year);
+if (d.language) metas.push(d.language);
+if (typeof d.stars === 'number') metas.push(`★ ${d.stars}`);
 ---
 
 <article class="card reveal">
-  {
-    d.link ? (
-      <a href={d.link} target="_blank" rel="noopener" style="display:block">
-        <div class="card-cover" style={coverStyle} />
-      </a>
-    ) : (
-      <div class="card-cover" style={coverStyle} />
-    )
-  }
+  <a class="card-cover" href={detailHref} style={coverStyle} aria-label={d.title}></a>
   <div class="card-body">
-    <span class="card-meta">{d.year}</span>
+    {metas.length > 0 && <span class="card-meta">{metas.join(' · ')}</span>}
     <h3>
-      {d.link ? (
-        <a href={d.link} target="_blank" rel="noopener">{d.title}</a>
-      ) : (
-        d.title
-      )}
+      <a href={detailHref}>{d.title}</a>
     </h3>
     <p class="muted">{d.summary}</p>
     {
@@ -48,6 +50,15 @@ const coverStyle = d.cover ? `background-image:url(${d.cover})` : `background:${
         </div>
       )
     }
-    {d.link && <a class="card-link" href={d.link} target="_blank" rel="noopener">查看 →</a>}
+    <div class="card-actions">
+      <a class="card-link" href={detailHref}>{ui.viewDetail} →</a>
+      {
+        githubUrl && (
+          <a class="card-link-ext" href={githubUrl} target="_blank" rel="noopener">
+            {ui.githubRepo} ↗
+          </a>
+        )
+      }
+    </div>
   </div>
 </article>

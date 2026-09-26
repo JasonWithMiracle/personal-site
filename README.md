@@ -20,13 +20,14 @@
 ├─ src/
 │  ├─ content/
 │  │  ├─ about/      ← 个人简介（zh.md / en.md），一般不用改
-│  │  ├─ projects/   ← 作品集（每件作品一个 .md）
-│  │  ├─ articles/   ← 文章（你日常写的地方）
+│  │  ├─ projects/   ← 作品集（一件作品一个 .md，可填 repo 同步 GitHub 数据，见第八节）
+│  │  ├─ articles/   ← 文章（你日常写的地方，排版规范见第九节）
 │  │  └─ practice/   ← 实践经验（从知识库「组织过程资产/经验总结」自动导入，见第七节）
-│  ├─ pages/         ← 页面代码（不用碰）
+│  ├─ pages/         ← 页面代码（不用碰。portfolio/ 下 index.astro 是列表、[...id].astro 是详情）
 │  ├─ components/    ← 组件（不用碰）
 │  ├─ styles/        ← 设计风格（想换颜色改这里）
 │  └─ lib/           ← 双语文字（一般不用碰）
+├─ scripts/          ← 导入与同步脚本（import-practice / sync-github-projects）
 ├─ public/           ← 图片等静态文件
 ├─ netlify.toml      ← 部署配置（已配好）
 └─ package.json
@@ -67,19 +68,31 @@
 
 ## 三、作品集模板（projects/zh/xxx.md）
 
+> 一件作品 = 一个 `.md` = 一张卡片 = 一个详情页。
+> 有 `repo` 字段 → 卡片和详情页自动出现 **GitHub 仓库 ↗** 外链按钮；没有则只显示「查看详情」。
+
 ```markdown
 ---
 title: 作品名称
 lang: zh
-summary: 一句话介绍
+summary: 一句话介绍（显示在卡片上）
 tags: [设计, 工具]
-link: https://example.com   # 可留空
+repo: JasonWithMiracle/仓库名    # ← 填了才会同步元数据与外链；本地项目删掉这行
+role: 独立开发                    # 可选，显示在详情页「我的角色」
 year: 2025
-featured: true             # true 会显示在首页精选；false 只进作品集页
-order: 1                   # 排序，数字越小越靠前
+demo: https://example.com         # 可选，在线演示（GitHub 之外再给一个按钮）
+featured: true                    # true 会显示在首页精选
+order: 1                          # 排序，数字越小越靠前
+draft: false                      # true 不上线
+
+# ⚠️ 以下 4 行由同步脚本自动回写，请勿手改
+github: "https://github.com/..."
+stars: 0
+language: "Python"
+updated: "2026-09-20"
 ---
 
-这里写作品详情（可选）。
+这里写作品详情正文（建议按：背景 → 我做了什么 → 关键决策/难点 → 结果）。
 ```
 
 ---
@@ -165,3 +178,40 @@ Netlify 自动重建后，以下页面即生效：
 - **Mermaid 图表**：详情页通过 CDN 按需加载 `mermaid@11`，运行时套用浅色适配主题（白底、浅蓝节点、`#0071e3` 边框），参考 `beautiful-mermaid` 的「清晰优先、充足留白」排版理念。
 - **底部版本号**：页脚显示 `v<SITE_VERSION>`（`src/lib/site.ts` 中的 `SITE_VERSION`），方便快速迭代监看；每次大改可手动 +1。
 - **Obsidian 独有语法**会被转译：`> [!tip]` 等 callout → 带样式的提示框；`[[wikilink]]` → 纯文本；本地绝对路径 → “本地 Obsidian vault”。
+
+---
+
+## 八、作品集：同步 GitHub 项目元数据
+
+作品卡片上的 star 数、语言、更新时间、仓库外链，都不用手写，一个命令从 GitHub 拉：
+
+```bash
+npm run sync:projects          # 同步并写入 md
+npm run sync:projects:dry      # 先预演，看会改什么（不写文件）
+npm run list:repos             # 列出 GitHub 上全部公开仓库，方便挑作品
+```
+
+- 只对**写了 `repo:` 字段**的作品生效；没写的作品原样跳过（所以本地未开源项目可以混排）。
+- 只改写 `github / stars / language / updated` 四个字段，**正文和其余字段一律不动**。
+- 未配置 `GITHUB_TOKEN` 时限速 60 次/小时，够用；需要更高额度就先 `set GITHUB_TOKEN=ghp_xxx`。
+
+新增一件 GitHub 作品的正确顺序：
+
+1. 在 `src/content/projects/zh/` 新建 `<slug>.md`，frontmatter 填 `repo: JasonWithMiracle/<仓库名>`
+2. 写正文（背景 → 我做了什么 → 关键决策/难点 → 结果）
+3. 跑 `npm run sync:projects`
+4. 提交推送
+
+---
+
+## 九、写文章：排版规范
+
+Markdown 只管结构、不管好看。站点已升级 `.prose` 排版系统（标题层级、引用卡片化、表格、图注、任务列表、代码块阴影），配合润色规范使用：
+
+- **完整规范与检查清单**：`20-执行/2026-09-27-文章润色与排版规范.md`
+- 关键约定三条：
+  1. 中文强调用 `**加粗**`，**不要用斜体**（中文是合成斜体，难看）；斜体留给图注
+  2. 图注写法：图片**独占一段**，紧跟着的那段只写一句 `*说明文字*`，会自动变成居中灰色小字
+  3. 对比/并列信息用表格，关键判断用 `>` 引用卡片，别写成一大段
+
+文章发布流程：选文 → 按规范润色 → 写入 `src/content/articles/zh/<slug>.md` → `npm run build` 验证 → GitHub Desktop 推送。

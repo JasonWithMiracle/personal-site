@@ -16,6 +16,15 @@ interface UIStrings {
   practiceDesc: string;
   readMore: string;
   notFound: string;
+  // 作品详情 / 卡片外链相关
+  viewDetail: string;
+  githubRepo: string;
+  liveDemo: string;
+  projectRole: string;
+  updatedAt: string;
+  prevProject: string;
+  nextProject: string;
+  emptyState: string;
 }
 
 export const UI: Record<Locale, UIStrings> = {
@@ -33,6 +42,14 @@ export const UI: Record<Locale, UIStrings> = {
     practiceDesc: '把知识库里落地实践的项目经验，沉淀成可复用的案例。',
     readMore: '阅读全文',
     notFound: '页面不存在',
+    viewDetail: '查看详情',
+    githubRepo: 'GitHub 仓库',
+    liveDemo: '在线演示',
+    projectRole: '我的角色',
+    updatedAt: '最近更新',
+    prevProject: '上一件作品',
+    nextProject: '下一件作品',
+    emptyState: '暂无内容',
   },
   en: {
     nav: { home: 'Home', portfolio: 'Work', articles: 'Writing', practice: 'Practice' },
@@ -48,6 +65,14 @@ export const UI: Record<Locale, UIStrings> = {
     practiceDesc: 'Field-tested project experience from my knowledge base, distilled into reusable case studies.',
     readMore: 'Read more',
     notFound: 'Page not found',
+    viewDetail: 'View details',
+    githubRepo: 'GitHub repo',
+    liveDemo: 'Live demo',
+    projectRole: 'Role',
+    updatedAt: 'Updated',
+    prevProject: 'Previous project',
+    nextProject: 'Next project',
+    emptyState: 'Nothing here yet',
   },
 };
 
@@ -59,20 +84,15 @@ export function otherLocale(l: Locale): Locale {
  * 根据当前路径生成“切换语言”的目标地址。
  * 路由约定：
  *  - 栏目页（首页 / 作品集 / 文章列表 / 实践列表）：中文无前缀，英文用 /en 前缀；
- *  - 文章详情 / 实践详情：中英文都挂在 <section>/<lang>/<slug>，语言段内嵌在路径中。
+ *  - 文章详情 / 实践详情 / 作品详情：中英文都挂在 <section>/<lang>/<slug>，语言段内嵌在路径中。
  */
 export function toggleLocale(pathname: string, to: Locale): string {
-  // 文章详情：直接替换路径内嵌的语言段（不产生 /en 前缀）
-  const art = pathname.match(/^\/articles\/(zh|en)\/(.+)$/);
-  if (art) {
-    const other = art[1] === 'zh' ? 'en' : 'zh';
-    return `/articles/${other}/${art[2]}/`;
-  }
-  // 实践详情：语言段内嵌在路径中（/practice/<lang>/<slug>）
-  const prac = pathname.match(/^\/practice\/(zh|en)\/(.+)$/);
-  if (prac) {
-    const other = prac[1] === 'zh' ? 'en' : 'zh';
-    return `/practice/${other}/${prac[2]}/`;
+  // 三种详情页：直接替换路径内嵌的语言段（不产生 /en 前缀）
+  const detail = pathname.match(/^\/(articles|practice|portfolio)\/(zh|en)\/(.+)$/);
+  if (detail) {
+    const [, section, current, rest] = detail;
+    const other = current === 'zh' ? 'en' : 'zh';
+    return `/${section}/${other}/${rest}/`;
   }
   // 栏目页：通过 /en 前缀切换
   let p = pathname;

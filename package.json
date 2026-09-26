@@ -7,7 +7,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "sync:projects": "node scripts/sync-github-projects.mjs",
+    "sync:projects:dry": "node scripts/sync-github-projects.mjs --dry-run",
+    "list:repos": "node scripts/sync-github-projects.mjs --list-repos"
   },
   "dependencies": {
     "astro": "^5.0.0"

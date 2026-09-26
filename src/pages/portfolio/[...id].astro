@@ -1,0 +1,126 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { UI, otherLocale, type Locale } from '../../lib/i18n';
+
+export async function getStaticPaths() {
+  // draft: true 的作品不生成详情页，避免未发布内容被直链访问
+  const projects = (await getCollection('projects')).filter((p) => !p.data.draft);
+  return projects.map((p) => ({
+    params: { id: p.id },
+    props: { id: p.id },
+  }));
+}
+
+const { id } = Astro.props;
+const entry = await getEntry('projects', id);
+if (!entry) return Astro.redirect('/404');
+
+const locale = entry.data.lang as Locale;
+const ui = UI[locale];
+const d = entry.data;
+const { Content } = await render(entry);
+
+const slug = id.split('/').slice(1).join('/');
+const listHref = locale === 'zh' ? '/portfolio/' : '/en/portfolio/';
+const detailHref = (p: { data: { lang: string }; id: string }) =>
+  `/portfolio/${p.data.lang}/${p.id.split('/').slice(1).join('/')}/`;
+
+// 全部作品（不区分语言），用于上下篇与「另一语言是否存在」判断
+const all = await getCollection('projects');
+const siblings = all
+  .filter((p) => p.data.lang === locale && !p.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+const idx = siblings.findIndex((p) => p.id === id);
+const prev = idx > 0 ? siblings[idx - 1] : null;
+const next = idx >= 0 && idx < siblings.length - 1 ? siblings[idx + 1] : null;
+
+// 另一语言版本存在时才显示语言切换（支持“先中文、后补英文”的渐进节奏）
+const altLocale = otherLocale(locale);
+const altUrl = all.some((p) => p.id === `${altLocale}/${slug}`)
+  ? `/portfolio/${altLocale}/${slug}/`
+  : null;
+
+// 外链：github 优先用脚本回写值，其次按 repo 拼；demo 回退到旧字段 link
+const githubUrl = d.github || (d.repo ? `https://github.com/${d.repo}` : null);
+const demoUrl = d.demo || d.link || null;
+
+const metaItems: string[] = [];
+if (d.year) metaItems.push(d.year);
+if (d.role) metaItems.push(`${ui.projectRole}：${d.role}`);
+if (d.language) metaItems.push(d.language);
+if (typeof d.stars === 'number') metaItems.push(`★ ${d.stars}`);
+if (d.updated) metaItems.push(`${ui.updatedAt} ${d.updated}`);
+---
+
+<BaseLayout
+  title={`${d.title} · Jason`}
+  description={d.summary}
+  locale={locale}
+  pathname={Astro.url.pathname}
+>
+  <article class="post reveal">
+    <a class="back" href={listHref}>← {ui.nav.portfolio}</a>
+    <h1 class="post-title">{d.title}</h1>
+    {metaItems.length > 0 && <p class="post-meta">{metaItems.join(' · ')}</p>}
+
+    {
+      (githubUrl || demoUrl || altUrl) && (
+        <div class="post-actions">
+          {githubUrl && (
+            <a class="btn btn-primary" href={githubUrl} target="_blank" rel="noopener">
+              {ui.githubRepo} ↗
+            </a>
+          )}
+          {demoUrl && (
+            <a class="btn btn-ghost" href={demoUrl} target="_blank" rel="noopener">
+              {ui.liveDemo} ↗
+            </a>
+          )}
+          {altUrl && <a class="btn btn-ghost" href={altUrl}>{ui.switchTo}</a>}
+        </div>
+      )
+    }
+
+    {
+      d.cover && (
+        <img class="post-cover" src={d.cover} alt={d.title} />
+      )
+    }
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {
+      d.tags.length > 0 && (
+        <div class="tags" style="margin-top:28px">
+          {d.tags.map((t) => (
+            <span class="tag">{t}</span>
+          ))}
+        </div>
+      )
+    }
+
+    {
+      (prev || next) && (
+        <nav class="post-nav">
+          {prev ? (
+            <a class="post-nav-item" href={detailHref(prev)}>
+              <span class="post-nav-label">← {ui.prevProject}</span>
+              <span class="post-nav-title">{prev.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )}
+          {next && (
+            <a class="post-nav-item align-right" href={detailHref(next)}>
+              <span class="post-nav-label">{ui.nextProject} →</span>
+              <span class="post-nav-title">{next.data.title}</span>
+            </a>
+          )}
+        </nav>
+      )
+    }
+  </article>
+</BaseLayout>

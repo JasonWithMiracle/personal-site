@@ -12,7 +12,7 @@ const about = await getEntry('about', locale);
 const d = about!.data;
 
 const projects = (await getCollection('projects'))
-  .filter((p) => p.data.lang === locale && p.data.featured)
+  .filter((p) => p.data.lang === locale && p.data.featured && !p.data.draft)
   .sort((a, b) => a.data.order - b.data.order);
 
 const articles = (await getCollection('articles'))

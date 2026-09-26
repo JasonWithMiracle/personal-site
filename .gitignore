@@ -17,3 +17,7 @@ Thumbs.db
 
 # WorkBuddy 本地记忆（不提交到仓库）
 .workbuddy/
+
+# VoiceDesk 草稿：仓库转 public 前不提交（页面不渲染，但本仓库是公开的，源码可见）
+# 上线 VoiceDesk 时删除下面这行，并提交该文件
+src/content/projects/zh/voicedesk.md
