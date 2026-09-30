@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "check": "node scripts/check-content.mjs",
     "sync:projects": "node scripts/sync-github-projects.mjs",
     "sync:projects:dry": "node scripts/sync-github-projects.mjs --dry-run",
     "list:repos": "node scripts/sync-github-projects.mjs --list-repos"

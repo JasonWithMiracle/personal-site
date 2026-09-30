@@ -177,7 +177,20 @@ Netlify 自动重建后，以下页面即生效：
 
 - **Mermaid 图表**：详情页通过 CDN 按需加载 `mermaid@11`，运行时套用浅色适配主题（白底、浅蓝节点、`#0071e3` 边框），参考 `beautiful-mermaid` 的「清晰优先、充足留白」排版理念。
 - **底部版本号**：页脚显示 `v<SITE_VERSION>`（`src/lib/site.ts` 中的 `SITE_VERSION`），方便快速迭代监看；每次大改可手动 +1。
-- **Obsidian 独有语法**会被转译：`> [!tip]` 等 callout → 带样式的提示框；`[[wikilink]]` → 纯文本；本地绝对路径 → “本地 Obsidian vault”。
+- **Obsidian 独有语法**在**导入链路**（`import-practice.mjs`）中会被自动转译：`> [!tip]` 等 callout → 带样式的提示框；`[[wikilink]]` → 纯文本；本地绝对路径 → “本地 Obsidian vault”。
+
+> ⚠️ **手写文章时请注意**：上述转译**只发生在导入脚本里**。你直接在 `src/content/` 下写的 md **不经过该脚本**，写了 `> [!tip]` 会原样残留成字面文本（构建不报错，只有打开页面才看得到）。
+>
+> 手写请直接用 HTML 形式：
+> ```html
+> <div class="callout callout-tip">
+> <p class="callout-title">标题</p>
+> <p>正文。</p>
+> </div>
+> ```
+> 可用类型：`callout-tip`（绿）/ `callout-warning`（橙）/ `callout-important`（蓝）/ `callout-note`（灰）/ `callout-danger`（红）。
+>
+> `npm run check` 会自动拦截这类残留。
 
 ---
 
@@ -204,14 +217,55 @@ npm run list:repos             # 列出 GitHub 上全部公开仓库，方便挑
 
 ---
 
-## 九、写文章：排版规范
+## 九、内容增改：规范与校验
 
-Markdown 只管结构、不管好看。站点已升级 `.prose` 排版系统（标题层级、引用卡片化、表格、图注、任务列表、代码块阴影），配合润色规范使用：
+> **两份规范，分工明确**：工程正确性看总纲，阅读体验看排版规范。
 
-- **完整规范与检查清单**：`20-执行/2026-09-27-文章润色与排版规范.md`
-- 关键约定三条：
-  1. 中文强调用 `**加粗**`，**不要用斜体**（中文是合成斜体，难看）；斜体留给图注
-  2. 图注写法：图片**独占一段**，紧跟着的那段只写一句 `*说明文字*`，会自动变成居中灰色小字
-  3. 对比/并列信息用表格，关键判断用 `>` 引用卡片，别写成一大段
+| 文档 | 管什么 |
+| ---- | ------ |
+| `20-执行/2026-09-30-内容增改管理规范.md` | **总纲**：四类内容集合的字段契约、增改流程、四道人工门禁、校验脚本说明、场景速查表 |
+| `20-执行/2026-09-27-文章润色与排版规范.md` | **排版**：渲染语法、frontmatter 写法、结构规范、**SVG 图表规范**、项目栏目排版、推送前验证 |
 
-文章发布流程：选文 → 按规范润色 → 写入 `src/content/articles/zh/<slug>.md` → `npm run build` 验证 → GitHub Desktop 推送。
+### 内容校验脚本
+
+`npm run check` 用于拦截「构建不报错、但线上渲染是错的」这类静默失败：
+
+```bash
+npm run check                    # 全量校验
+npm run check -- --grep darwin   # 只校验匹配关键字的条目
+npm run check -- --json          # 输出 JSON，便于接入其它工具
+```
+
+校验项包括：frontmatter 必填字段、`lang` 与目录一致性、slug 命名、日期格式、
+**Obsidian 语法残留**、SVG 可访问性（`role` / `aria-labelledby` / `viewBox`）、
+内部链接、图片引用、双语配对、`repo` 字段格式。
+
+**错误**必须修复（退出码 1）；**警告**需人工判断。
+
+### 标准流程（五步）
+
+```bash
+# 1 定位：确定集合（articles / practice / projects / about）与 slug
+# 2 撰写：按字段契约写 frontmatter，按排版规范写正文
+
+# 3 校验（不通过不得继续）
+npm run check
+
+# 4 构建 + 预览（必须实际打开页面看）
+npm run build
+npm run preview
+
+# 5 推送（需人工确认，push 即上线）
+git add src/content && git commit -m "content: 新增 <slug>" && git push
+```
+
+> **构建被 safe-delete 拦截时**：`mv dist "_stale_dist_$(date +%H%M%S)"` 隔离旧产物后重建，不要反复重试 `rm`。
+
+### 四条排版关键约定
+
+1. 中文强调用 `**加粗**`，**不要用斜体**（中文是合成斜体，难看）；斜体留给图注
+2. 图注写法：图片**独占一段**，紧跟着的那段只写一句 `*说明文字*`，会自动变成居中灰色小字
+3. 对比/并列信息用表格，关键判断用 callout，别写成一大段
+4. **图表一律用内联 SVG，不用 Mermaid**（构建时渲染、零依赖、样式可控）
+
+> SVG 图的完整绘制规范见排版规范第七节（骨架、配色令牌、版式纪律、自检清单）。

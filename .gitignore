@@ -4,6 +4,11 @@ dist/
 .astro/
 .cache/
 
+# safe-delete 沙箱拦截时隔离出的旧产物（mv 改名，见 README 第九节）
+_stale_dist_*/
+_stale_probe_*
+_stale_*/
+
 # 环境变量等敏感文件
 .env
 .env.production
@@ -21,3 +26,5 @@ Thumbs.db
 # VoiceDesk 草稿：仓库转 public 前不提交（页面不渲染，但本仓库是公开的，源码可见）
 # 上线 VoiceDesk 时删除下面这行，并提交该文件
 src/content/projects/zh/voicedesk.md
+40-收尾/
+
