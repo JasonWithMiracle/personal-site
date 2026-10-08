@@ -1,14 +1,15 @@
 /**
- * 生成作品集卡片封面：截取 GitHub 仓库 README 顶部（标题 + 简介 + 要点）。
+ * 生成作品集卡片封面：以仓库 README 信息为素材的「标题型」封面。
  *
  * 设计要点：
  *   1. 不直接截 GitHub 页面 —— 仓库页 README 被多层 max-width 容器夹住，
  *      右侧大片留白，且页面有导航/侧栏/汉堡按钮等干扰元素。
  *      改为：取 README 的渲染后 HTML，注入到自建干净页面中渲染，宽度完全可控。
- *   2. 标题可覆盖 —— 部分仓库 README 的 H1 是英文 slug（如 workbuddy-token-audit），
+ *   2. 卡片在页面上实际宽度只有约 290px，封面缩到约 1/5 尺寸。
+ *      此时正文级字号（20px 上下）会糊成一团 —— 故封面**只保留主标题**，
+ *      不留简介；标题用超大字号并整体居中，缩略后仍然清晰。
+ *   3. 标题可覆盖 —— 部分仓库 README 的 H1 是英文 slug（如 workbuddy-token-audit），
  *      直接当封面像代码仓；可配置 titleOverride 换成作品名。
- *   3. 内容裁剪 —— 只保留「标题 + 简介 + 要点行」，遇到第一个内容分节（h2/hr/大段）
- *      即停止，保证不同仓库封面信息量均衡。
  *
  * 用法：
  *   node scripts/capture-repo-covers.mjs
@@ -40,18 +41,12 @@ const TARGETS = [
     repo: 'JasonWithMiracle/workbuddy-token-audit',
     // README 的 H1 是英文 slug，封面改用网站上的作品名
     titleOverride: 'WorkBuddy Token 审计工具',
-    // README 原简介是中英混排的术语句，封面换成更直白的表述（不改仓库 README）
-    summaryOverride:
-      '读取 WorkBuddy 本地请求日志，按任务维度核算 Token 消耗与成本，支持峰谷分时与缓存分档计价。',
   },
   {
     slug: 'shooting-plan-workbench',
     repo: 'JasonWithMiracle/shooting-plan-workbench',
     // 该仓库 README 的 H1 已是中英双语标题，无需覆盖
     titleOverride: null,
-    // README 原简介是「不是什么」的对比式表述，封面换成先说清「是什么」
-    summaryOverride:
-      '面向摄影工作室的单文件策划工具：双击即用、离线可填，从方案到通告一站式完成，一键导出 PDF + DOCX。',
   },
 ];
 
@@ -62,54 +57,51 @@ const H = 1000;
 const C = {
   bg: '#0d1117',
   fg: '#e6edf3',
-  fgMuted: '#9198a1',
   border: '#3d444d',
   link: '#4493f8',
   codeBg: 'rgba(110,118,129,0.2)',
 };
 
+/**
+ * 标题型封面样式：
+ *   - 整块 flex 居中（水平 + 垂直），只有标题一个主视觉元素；
+ *   - 字号按标题长度自适应（见 scaleTitle），保证长短标题都有合适占幅；
+ *   - 不再渲染简介，避免缩到卡片宽时糊成一团。
+ */
 const COVER_CSS = `
   html, body { margin:0; padding:0; background:${C.bg}; }
   .cover {
     width: ${W}px; height: ${H}px;
     box-sizing: border-box;
-    padding: 130px 100px;
+    padding: 96px 110px;
     background: ${C.bg};
     color: ${C.fg};
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial,
                  "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    font-size: 23px;
-    line-height: 1.7;
     overflow: hidden;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: center;
+    text-align: center;
   }
-  .cover-inner { width: 100%; }
   .cover h1 {
-    font-size: 68px; line-height: 1.2; font-weight: 600;
-    margin: 0 0 32px; padding-bottom: 26px;
-    border-bottom: 1px solid ${C.border};
+    font-size: 96px;
+    line-height: 1.26;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+    word-break: break-word;
   }
-  .cover p { margin: 0 0 18px; color: ${C.fgMuted}; font-size: 24px; line-height: 1.65; }
-  .cover strong { color: ${C.fg}; font-weight: 600; }
-  .cover a { color: ${C.link}; text-decoration: none; }
-  .cover code {
-    background: ${C.codeBg}; border-radius: 6px; padding: 2px 7px; font-size: 0.88em;
-    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  /* 若标题里含中英双语（如「拍摄策划工作台 Shooting Plan Workbench」），
+     用较弱的视觉权重呈现英文部分，主次分明 */
+  .cover .sub {
+    display: block;
+    font-size: 0.5em;
+    font-weight: 400;
+    color: ${C.link};
+    margin-top: 0.32em;
+    letter-spacing: 0;
   }
-  /* 徽章/图片一律不展示，避免封面出现零碎小图标 */
-  .cover img, .cover svg { display: none !important; }
-  /* 隐藏式分隔线（徽章行清空后留下的） */
-  .cover hr { display: none !important; }
-  /* 内容不足 1 段的空 p（被隐藏徽章留下的空行）直接折叠 */
-  .cover-inner > p:empty { display: none !important; }
-  /*
-   * 只保留「标题 + 简介 + 要点」三段资讯，其余裁掉防信息过载。
-   * 注意：README 结构不一致（有的第 3 个元素是 hr、有的是版本行），
-   * 故这里不用 nth-child 硬切，而是在 JS 侧按“可见内容块”计数后再裁，
-   * 见下方 trimCover()。
-   */
 `;
 
 function ensureDir(p) {
@@ -135,105 +127,90 @@ async function main() {
       timeout: 60000,
     });
     await fetchPage.waitForSelector('article.markdown-body', { timeout: 30000 });
-    const readmeHtml = await fetchPage.$eval('article.markdown-body', (el) => el.innerHTML);
+
+    // 提取 README 的主标题文本（GitHub 把标题包在 div.markdown-heading 里）
+    const rawTitle = await fetchPage.$eval('article.markdown-body', (el) => {
+      for (const child of [...el.children]) {
+        if (/^H[1-6]$/.test(child.tagName)) return child.textContent.trim();
+        const h = child.querySelector && child.querySelector('h1,h2');
+        if (h) return h.textContent.trim();
+      }
+      return '';
+    });
     await fetchPage.close();
 
-    // ---------- 渲染页：只负责把 HTML 渲染成封面（完全离线） ----------
-    // 独立页面 + 阻断一切外部请求，避免 README 里的外链图片/字体拖垮 setContent
+    // ---------- 渲染页：完全离线，只画一个居中的标题 ----------
     const renderPage = await ctx.newPage();
     await renderPage.route('**/*', (route) => {
       const u = route.request().url();
       if (u.startsWith('data:') || u.startsWith('about:') || u.startsWith('blob:')) {
         return route.continue();
       }
-      return route.abort(); // 注入页面自带内联样式，不需要任何外部资源
+      return route.abort(); // 自建页面全内联，不需要任何外部资源
     });
+
+    const title = t.titleOverride || rawTitle || t.slug;
+
+    // 标题若形如「中文 English」（中英混排），拆成主标题 + 副标题显示更清晰
+    const m = title.match(/^(.+?)\s+([A-Za-z][A-Za-z0-9\s\-&.]*)$/);
+    const main = m ? m[1].trim() : title;
+    const sub = m ? m[2].trim() : '';
+    const titleHtml = sub
+      ? `${escapeHtml(main)}<span class="sub">${escapeHtml(sub)}</span>`
+      : escapeHtml(title);
 
     const doc = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
       <style>${COVER_CSS}</style></head>
-      <body><div class="cover"><div class="cover-inner">${readmeHtml}</div></div></body></html>`;
+      <body><div class="cover"><h1>${titleHtml}</h1></div></body></html>`;
 
     await renderPage.setContent(doc, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await renderPage.waitForTimeout(400);
 
-    // 3~5 步统一在一段 evaluate 里完成，避免多次 DOM 改写互相干扰
-    await renderPage.evaluate(
-      ({ titleOverride, summaryOverride }) => {
-        const inner = document.querySelector('.cover-inner');
-        if (!inner) return;
+    // 标题字号自适应：目标是让标题横向占满画面约 78%，
+    // 缩到卡片实际宽度（约 290px）后仍清晰可读。
+    await renderPage.evaluate(() => {
+      const h1 = document.querySelector('.cover h1');
+      const cover = document.querySelector('.cover');
+      if (!h1 || !cover) return;
+      const avail = cover.clientWidth; // 已扣掉 padding
+      const target = avail * 0.78;
 
-        // ---- a) 定位主标题元素（GitHub 用 div.markdown-heading 包 h1；也可能直接是 h1）----
-        let titleEl = null; // 承载标题文本的元素
-        for (const el of [...inner.children]) {
-          if (/^H[1-6]$/.test(el.tagName)) { titleEl = el; break; }
-          const h = el.querySelector && el.querySelector('h1,h2');
-          if (h) { titleEl = h; break; }
-        }
-        if (titleEl && titleOverride) titleEl.textContent = titleOverride;
+      // 从大到小试探，找到不超过目标宽度的最大字号
+      let size = 200;
+      h1.style.fontSize = size + 'px';
+      while (size > 40 && h1.scrollWidth > target) {
+        size -= 2;
+        h1.style.fontSize = size + 'px';
+      }
+      // 高度也要塞得进（多行标题时）
+      const maxH = cover.clientHeight * 0.82;
+      while (size > 40 && h1.scrollHeight > maxH) {
+        size -= 2;
+        h1.style.fontSize = size + 'px';
+      }
+    });
+    await renderPage.waitForTimeout(200);
 
-        // 记录标题所在顶层块，后续据此判断“标题是否已出现”
-        const titleTop = titleEl ? titleEl.closest('.cover-inner > *') : null;
-
-        // ---- b) 覆盖简介：标题块之后第一个非空 BLOCKQUOTE / P ----
-        const isHeadingBlock2 = (el) =>
-          /^H[1-6]$/.test(el.tagName) || !!(el.querySelector && el.querySelector('h1,h2,h3,h4,h5,h6'));
-        if (summaryOverride) {
-          let passedTitle = false;
-          for (const el of [...inner.children]) {
-            if (isHeadingBlock2(el)) { passedTitle = true; continue; }
-            if (!passedTitle) continue;
-            if (el.tagName === 'BLOCKQUOTE' || el.tagName === 'P') {
-              if (!(el.textContent || '').trim()) continue;
-              el.textContent = summaryOverride;
-              break;
-            }
-          }
-        }
-
-        // ---- c) 裁剪：保留主标题 + 其后 2 个正文块，其余隐藏 ----
-        //     注意：GitHub 的标题可能包在 <div class="markdown-heading"> 里，
-        //     所以判“是不是标题块”要看它内部是否含标题元素，而非自身 tagName。
-        const isHeadingBlock = (el) =>
-          /^H[1-6]$/.test(el.tagName) || !!(el.querySelector && el.querySelector('h1,h2,h3,h4,h5,h6'));
-
-        let seenTitle = false;
-        let kept = 0;
-        // 封面信息结构：主标题 + 1 段简介。多于此会让封面像 README 而非卡片封面。
-        const KEEP_BLOCKS = 1;
-        for (const el of [...inner.children]) {
-          const text = (el.textContent || '').trim();
-
-          if (!text || el.tagName === 'HR') { el.style.display = 'none'; continue; }
-
-          if (isHeadingBlock(el)) {
-            if (!seenTitle) { seenTitle = true; continue; } // 主标题保留
-            el.style.display = 'none';                      // 后续小标题裁掉
-            continue;
-          }
-
-          if (!seenTitle) { el.style.display = 'none'; continue; }
-
-          kept += 1;
-          if (kept > KEEP_BLOCKS) el.style.display = 'none';
-        }
-      },
-      { titleOverride: t.titleOverride, summaryOverride: t.summaryOverride },
-    );
-    await renderPage.waitForTimeout(250);
-
-    // 4) 截图（固定 16:10 画布，内容垂直居中）
     await renderPage.screenshot({
       path: resolve(OUT_DIR, `${t.slug}.png`),
       clip: { x: 0, y: 0, width: W, height: H },
       fullPage: false,
     });
 
-    console.log(`✓ ${t.slug} → public/covers/${t.slug}.png  (${W}×${H})`);
+    console.log(`✓ ${t.slug} → public/covers/${t.slug}.png  「${main}${sub ? ' / ' + sub : ''}」`);
     await renderPage.close();
   }
 
   await browser.close();
   console.log('\n完成。');
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 main().catch((e) => {
