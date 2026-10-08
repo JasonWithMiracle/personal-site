@@ -5,7 +5,10 @@ import { UI, otherLocale, type Locale } from '../../lib/i18n';
 
 export async function getStaticPaths() {
   // draft: true 的作品不生成详情页，避免未发布内容被直链访问
-  const projects = (await getCollection('projects')).filter((p) => !p.data.draft);
+  // detail_external: true 的作品「查看详情」直跳外链，同样不生成站内详情页
+  const projects = (await getCollection('projects')).filter(
+    (p) => !p.data.draft && !p.data.detail_external,
+  );
   return projects.map((p) => ({
     params: { id: p.id },
     props: { id: p.id },
@@ -29,15 +32,17 @@ const detailHref = (p: { data: { lang: string }; id: string }) =>
 // 全部作品（不区分语言），用于上下篇与「另一语言是否存在」判断
 const all = await getCollection('projects');
 const siblings = all
-  .filter((p) => p.data.lang === locale && !p.data.draft)
+  .filter((p) => p.data.lang === locale && !p.data.draft && !p.data.detail_external)
   .sort((a, b) => a.data.order - b.data.order);
 const idx = siblings.findIndex((p) => p.id === id);
 const prev = idx > 0 ? siblings[idx - 1] : null;
 const next = idx >= 0 && idx < siblings.length - 1 ? siblings[idx + 1] : null;
 
 // 另一语言版本存在时才显示语言切换（支持“先中文、后补英文”的渐进节奏）
+// 仅当对方版本也是站内详情页型时才给切换入口，避免链到不存在的页面
 const altLocale = otherLocale(locale);
-const altUrl = all.some((p) => p.id === `${altLocale}/${slug}`)
+const altEntry = all.find((p) => p.id === `${altLocale}/${slug}`);
+const altUrl = altEntry && !altEntry.data.detail_external
   ? `/portfolio/${altLocale}/${slug}/`
   : null;
 

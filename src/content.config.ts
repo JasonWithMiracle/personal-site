@@ -34,6 +34,9 @@ const projects = defineCollection({
     github: z.string().optional(),
     // 在线演示地址（可选）
     demo: z.string().optional(),
+    // 详情页外链模式：为 true 时不生成站内详情页，
+    // 卡片「查看详情」直接跳转到 demo（用于纯在线站点型作品，无站点内正文）
+    detail_external: z.boolean().default(false),
     // 以下三项由 scripts/sync-github-projects.mjs 从 GitHub API 回写，请勿手改
     stars: z.number().optional(),
     language: z.string().optional(),

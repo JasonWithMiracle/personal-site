@@ -18,6 +18,13 @@ const detailHref = `/portfolio/${d.lang}/${slug}/`;
 // 外链：github 优先用同步脚本回写值，其次按 repo 拼
 const githubUrl = d.github || (d.repo ? `https://github.com/${d.repo}` : null);
 
+// 详情入口：
+//  - detail_external 为 true → 「查看详情」直跳 demo（纯在线站点型作品，无站内正文）
+//  - 否则 → 站内详情页
+const externalDetail = d.detail_external && d.demo ? d.demo : null;
+const detailLinkHref = externalDetail ?? detailHref;
+const detailExternalAttrs = externalDetail ? { target: '_blank', rel: 'noopener' } : {};
+
 // 纯色占位：根据标题生成稳定的浅色调，避免空白或破图
 function hashHue(str: string) {
   let h = 0;
@@ -34,11 +41,11 @@ if (typeof d.stars === 'number') metas.push(`★ ${d.stars}`);
 ---
 
 <article class="card reveal">
-  <a class="card-cover" href={detailHref} style={coverStyle} aria-label={d.title}></a>
+  <a class="card-cover" href={detailLinkHref} style={coverStyle} aria-label={d.title} {...detailExternalAttrs}></a>
   <div class="card-body">
     {metas.length > 0 && <span class="card-meta">{metas.join(' · ')}</span>}
     <h3>
-      <a href={detailHref}>{d.title}</a>
+      <a href={detailLinkHref} {...detailExternalAttrs}>{d.title}</a>
     </h3>
     <p class="muted">{d.summary}</p>
     {
@@ -51,7 +58,7 @@ if (typeof d.stars === 'number') metas.push(`★ ${d.stars}`);
       )
     }
     <div class="card-actions">
-      <a class="card-link" href={detailHref}>{ui.viewDetail} →</a>
+      <a class="card-link" href={detailLinkHref} {...detailExternalAttrs}>{ui.viewDetail} →</a>
       {
         githubUrl && (
           <a class="card-link-ext" href={githubUrl} target="_blank" rel="noopener">
