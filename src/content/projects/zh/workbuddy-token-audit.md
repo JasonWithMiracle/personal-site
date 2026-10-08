@@ -3,6 +3,7 @@ title: WorkBuddy Token 审计工具
 lang: zh
 summary: 解析 WorkBuddy 本地请求日志，按任务/会话维度核算 Token 消耗与成本，支持分时与分段计价。
 tags: [Python, 成本分析, 工具开发]
+cover: /covers/workbuddy-token-audit.png
 repo: JasonWithMiracle/workbuddy-token-audit
 role: 独立开发
 year: 2026

@@ -3,6 +3,7 @@ title: 拍摄策划工作台
 lang: zh
 summary: 面向摄影工作室的单文件离线策划工作台，双击即用、无后端无构建，把拍摄前的方案、分镜与通告整合到一个页面里。
 tags: [HTML, 工作台, 工具开发]
+cover: /covers/shooting-plan-workbench.png
 repo: JasonWithMiracle/shooting-plan-workbench
 demo: "https://jasonwithmiracle.github.io/shooting-plan-workbench/online/"
 detail_external: true

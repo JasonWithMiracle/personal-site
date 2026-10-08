@@ -3,6 +3,7 @@ title: "Shooting Plan Workbench"
 lang: en
 summary: "A single-file, offline planning workbench for photography studios. Open the file and start working — no backend, no build step, no installation."
 tags: ["HTML", "Workbench", "Tooling"]
+cover: /covers/shooting-plan-workbench.png
 repo: JasonWithMiracle/shooting-plan-workbench
 demo: "https://jasonwithmiracle.github.io/shooting-plan-workbench/online/"
 detail_external: true
