@@ -27,8 +27,13 @@
 │  ├─ components/    ← 组件（不用碰）
 │  ├─ styles/        ← 设计风格（想换颜色改这里）
 │  └─ lib/           ← 双语文字（一般不用碰）
-├─ scripts/          ← 导入与同步脚本（import-practice / sync-github-projects）
+├─ scripts/          ← 导入与同步脚本（import-practice / sync-github-projects / check-content）
 ├─ public/           ← 图片等静态文件
+├─ 10-审查与方案/     ← 迭代方案（已纳入版本控制）
+├─ 20-执行/           ← 内容规范 / 排版规范（已纳入版本控制）
+├─ 40-收尾/           ← 收尾与交接文档（2026-10-09 起纳入版本控制）
+├─ VERSION           ← ★ 版本号单一事实源（页脚与台账均以此为准）
+├─ 版本迭代台账.md    ← 每次迭代登记一行
 ├─ netlify.toml      ← 部署配置（已配好）
 └─ package.json
 ```
@@ -176,7 +181,7 @@ Netlify 自动重建后，以下页面即生效：
 ### 4. 其他约定
 
 - **Mermaid 图表**：详情页通过 CDN 按需加载 `mermaid@11`，运行时套用浅色适配主题（白底、浅蓝节点、`#0071e3` 边框），参考 `beautiful-mermaid` 的「清晰优先、充足留白」排版理念。
-- **底部版本号**：页脚显示 `v<SITE_VERSION>`（`src/lib/site.ts` 中的 `SITE_VERSION`），方便快速迭代监看；每次大改可手动 +1。
+- **底部版本号**：页脚显示 `v<SITE_VERSION>`，`SITE_VERSION` 由仓库根目录的 **`VERSION` 文件**在构建期读取（**单一事实源**，见第十节）。改版本号**只改 `VERSION` 一处**，并同步登记 `版本迭代台账.md`。
 - **Obsidian 独有语法**在**导入链路**（`import-practice.mjs`）中会被自动转译：`> [!tip]` 等 callout → 带样式的提示框；`[[wikilink]]` → 纯文本；本地绝对路径 → “本地 Obsidian vault”。
 
 > ⚠️ **手写文章时请注意**：上述转译**只发生在导入脚本里**。你直接在 `src/content/` 下写的 md **不经过该脚本**，写了 `> [!tip]` 会原样残留成字面文本（构建不报错，只有打开页面才看得到）。
@@ -269,3 +274,42 @@ git add src/content && git commit -m "content: 新增 <slug>" && git push
 4. **图表一律用内联 SVG，不用 Mermaid**（构建时渲染、零依赖、样式可控）
 
 > SVG 图的完整绘制规范见排版规范第七节（骨架、配色令牌、版式纪律、自检清单）。
+
+---
+
+## 十、版本号与仓库受控范围（2026-10-09 起）
+
+### 1. 版本号单一事实源
+
+| 项 | 说明 |
+| ---- | ---- |
+| 唯一来源 | 仓库根目录 **`VERSION`** 文件（内容形如 `2.1.2`） |
+| 页脚 | `Footer.astro` 读取 `src/lib/site.ts` 导出的 `SITE_VERSION`（构建期从 `VERSION` 读取），显示为 `v2.1.2` |
+| 台账 | 项目内 `版本迭代台账.md` 每次迭代登记一行；组织级 `组织过程资产/项目版本台账.md` 同步 PRJ-2026-007 行 |
+| 规则 | 改动 ≤30% → PATCH；30%<x≤50% → MINOR；>50% → MAJOR（`组织过程资产/工具/项目收尾/version_bump.py`） |
+| 铁律 | **改版本号只改 `VERSION` 一处**，再同步台账三处，杜绝页脚/台账双轨漂移 |
+
+### 2. 仓库受控范围（git 跟踪）
+
+| 类别 | 路径 | 状态 |
+| ---- | ---- | ---- |
+| 源码 | `src/`（content / pages / components / layouts / lib / styles） | ✅ 纳入 |
+| 脚本 | `scripts/`（含 `push_via_api.py`） | ✅ 纳入 |
+| 静态资源 | `public/` | ✅ 纳入 |
+| 部署与工程配置 | `netlify.toml` / `astro.config.mjs` / `package.json` / `package-lock.json` / `.gitignore` | ✅ 纳入 |
+| 项目文档 | `README.md` / `版本迭代台账.md` / `10-审查与方案/` / `20-执行/` / `40-收尾/` | ✅ 纳入 |
+| 版本源 | `VERSION` | ✅ 纳入 |
+| 构建产物与依赖 | `node_modules/` / `dist/` / `.astro/` / `_stale_*` | ⛔ 忽略（可重建） |
+| 私密差异项 | `src/content/projects/zh/voicedesk.md`（仓库转 public 前不提交） | ⛔ 忽略（上线时移除该行） |
+
+### 3. 沙箱受限时的推送兜底
+
+若 `git push` 因网络出口被拦截失败，改用 GitHub Git Data API 镜像推送：
+
+```bash
+# 需先设置 GH_TOKEN（不在仓库中硬编码任何凭证）
+set GH_TOKEN=ghp_xxx
+python scripts/push_via_api.py
+```
+
+脚本按**脚本自身位置**推导仓库目录（也可用环境变量 `SITE_REPO_DIR` 覆盖），不再硬编码本机路径。
