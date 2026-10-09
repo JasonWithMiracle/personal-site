@@ -283,8 +283,8 @@ git add src/content && git commit -m "content: 新增 <slug>" && git push
 
 | 项 | 说明 |
 | ---- | ---- |
-| 唯一来源 | 仓库根目录 **`VERSION`** 文件（内容形如 `2.1.2`） |
-| 页脚 | `Footer.astro` 读取 `src/lib/site.ts` 导出的 `SITE_VERSION`（构建期从 `VERSION` 读取），显示为 `v2.1.2` |
+| 唯一来源 | 仓库根目录 **`VERSION`** 文件（内容形如 `2.1.3`） |
+| 页脚 | `Footer.astro` 读取 `src/lib/site.ts` 导出的 `SITE_VERSION`（构建期从 `VERSION` 读取），显示为 `v2.1.3` |
 | 台账 | 项目内 `版本迭代台账.md` 每次迭代登记一行；组织级 `组织过程资产/项目版本台账.md` 同步 PRJ-2026-007 行 |
 | 规则 | 改动 ≤30% → PATCH；30%<x≤50% → MINOR；>50% → MAJOR（`组织过程资产/工具/项目收尾/version_bump.py`） |
 | 铁律 | **改版本号只改 `VERSION` 一处**，再同步台账三处，杜绝页脚/台账双轨漂移 |
