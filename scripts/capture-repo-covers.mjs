@@ -48,6 +48,12 @@ const TARGETS = [
     // 该仓库 README 的 H1 已是中英双语标题，无需覆盖
     titleOverride: null,
   },
+  {
+    slug: 'workbuddy-quota-guard',
+    repo: 'JasonWithMiracle/workbuddy-quota-guard',
+    // README 的 H1 是英文 slug，封面改用网站上的作品名
+    titleOverride: 'WorkBuddy 配额感知器 Quota Guard',
+  },
 ];
 
 const W = 1600;

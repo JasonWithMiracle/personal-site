@@ -12,7 +12,7 @@ order: 1
 github: "https://github.com/JasonWithMiracle/workbuddy-token-audit"
 stars: 0
 language: "Python"
-updated: "2026-09-20"
+updated: "2026-10-17"
 ---
 
 用 AI 干活久了，最说不清的一个问题是：**这笔活到底烧了多少 token、值多少钱**。UI 上只能看到额度，看不到明细，更没法按任务归因。

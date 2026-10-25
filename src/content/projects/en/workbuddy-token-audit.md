@@ -12,7 +12,7 @@ order: 1
 github: "https://github.com/JasonWithMiracle/workbuddy-token-audit"
 stars: 0
 language: "Python"
-updated: "2026-09-20"
+updated: "2026-10-17"
 ---
 
 After working with AI for a while, the hardest question to answer is this: **how many tokens did this job actually burn, and what did it cost?** The UI only shows a quota — no breakdown, and certainly no way to attribute it per task.
